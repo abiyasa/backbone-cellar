@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 var express = require('express')
-  , routes = require('./routes');
+  , routes = require('./routes/route1.js');
 
 var app = module.exports = express.createServer();
 
@@ -27,7 +27,6 @@ app.configure('production', function(){
 });
 
 // Routes
-app.get('/', routes.index);
 app.get('/api/wines/:id?', routes.wineGet);
 app.get('/api/*', function(req, res) {
   // unsupported API
