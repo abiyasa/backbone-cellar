@@ -28,6 +28,7 @@ app.configure('production', function(){
 
 // Routes
 app.get('/api/wines/:id?', routes.wineGet);
+app.post('/api/wines/:id?', routes.wineCreate);
 app.get('/api/*', function(req, res) {
   // unsupported API
   res.send(false);
