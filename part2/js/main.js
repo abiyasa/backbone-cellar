@@ -5,8 +5,8 @@ window.Wine = Backbone.Model.extend({
         "id":null,
         "name":"",
         "grapes":"",
-        "country":"USA",
-        "region":"California",
+        "country":"Italy",
+        "region":"Tuscany",
         "year":"",
         "description":"",
         "picture":""
