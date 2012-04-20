@@ -137,7 +137,9 @@ exports.wineGet = function(req, res) {
       theRow = results[i];
       tempRowRes = {};      
       for (fieldName in fields) {
-        tempRowRes[fieldName] = theRow[fieldName];
+        if (fields.hasOwnProperty(fieldName)) {
+          tempRowRes[fieldName] = theRow[fieldName];
+        }
       }
       
       tempResults.push(tempRowRes);
@@ -159,14 +161,27 @@ exports.wineGet = function(req, res) {
 exports.wineCreate = function(req, res) {
   console.log('wineCreate()');
 
-  // check the item id  & prepare query  
-  var theItem = req.params;  
-  var queryStr = util.format('insert into %s set name=\'%s\', ', 
-    TABLE_NAME, theItem.name);
-  
+  // prepare query for inserting new item
+  var theItem = req.body;  
+  var queryStr = util.format('insert into %s set name=\'%s\', year=\'%s\', ' + 
+    ' grapes=\'%s\', country=\'%s\',  region=\'%s\', description=\'%s\' ', 
+    TABLE_NAME, theItem.name, theItem.year, theItem.grapes, theItem.country, theItem.region, 
+    theItem.description);
+
   console.log('will execute DB query:' + queryStr);
   
-  res.send(false);
+  db.query(queryStr, function(err, results) {
+    if (err) {
+      res.send(err.toString(), 404);      
+    } else {    
+      // send the item id within the result    
+      res.send({
+        id: results.insertId
+      });
+    }
+  });
+  
+
 };
 
 initDB();
