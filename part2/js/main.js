@@ -90,6 +90,9 @@ window.WineView = Backbone.View.extend({
         // this.model.set(change);
     },
 
+    // a flag to indicate wait for server result for create, delete, and update
+    statusWait: true,
+    
     saveWine:function () {
         this.model.set({
             name:$('#name').val(),
@@ -100,7 +103,11 @@ window.WineView = Backbone.View.extend({
             description:$('#description').val()
         });
         if (this.model.isNew()) {
-            app.wineList.create(this.model);
+            app.wineList.create(this.model, { 
+              wait: this.statusWait,
+              error: function() {
+                alert('Error! Cannot add new wine to our database!');
+              }});
         } else {
             this.model.save();
         }
