@@ -109,7 +109,12 @@ window.WineView = Backbone.View.extend({
                 alert('Error! Cannot add new wine to our database!');
               }});
         } else {
-            this.model.save();
+            this.model.save(null, {
+              wait: this.statusWait,
+              success:function () {
+                  alert('Wine has been updated!');
+              }              
+            });
         }
         return false;
     },
