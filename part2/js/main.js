@@ -116,6 +116,7 @@ window.WineView = Backbone.View.extend({
 
     deleteWine:function () {
         this.model.destroy({
+            wait: this.statusWait,
             success:function () {
                 alert('Wine deleted successfully');
                 window.history.back();
