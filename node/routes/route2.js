@@ -56,7 +56,7 @@ var resetTable = function() {
 var createDB = function() {
   console.log('creating DB ' + DATABASE_NAME);
   
-  db.query('create database ' + DATABASE_NAME, function(err) {
+  db.query('CREATE database ' + DATABASE_NAME, function(err) {
     if (err) {
       if (err.number === mysql.ERROR_DB_CREATE_EXISTS) {
         console.log('database is already exist');
@@ -84,7 +84,7 @@ var initDB = function() {
   db.on('error', onError);
   
   // try to use databases
-  db.query('use ' + DATABASE_NAME, function(err){
+  db.query('USE ' + DATABASE_NAME, function(err){
     if (err) {
       if (err.number === mysql.ERROR_BAD_DB_ERROR) {
         console.log('Database ' + DATABASE_NAME + ' is not exist. Will create the DB');
@@ -109,12 +109,12 @@ exports.wineGet = function(req, res) {
 
   // check the item id  & prepare query
   var itemId = req.params.id;
-  var queryStr = 'select * from ' + TABLE_NAME;
+  var queryStr = 'SELECT * FROM ' + TABLE_NAME;
   if (itemId) {
     console.log('searching for wine id=', itemId);
 
     //  get the item
-    queryStr += ' where id = \'' + itemId + '\'';
+    queryStr += ' WHERE id = \'' + itemId + '\'';
   } else {
     // return all wine
     console.log('will return all wine');
@@ -163,7 +163,7 @@ exports.wineCreate = function(req, res) {
 
   // prepare query for inserting new item
   var theItem = req.body;  
-  var queryStr = util.format('insert into %s set name=\'%s\', year=\'%s\', ' + 
+  var queryStr = util.format('INSERT INTO %s SET name=\'%s\', year=\'%s\', ' + 
     ' grapes=\'%s\', country=\'%s\',  region=\'%s\', description=\'%s\' ', 
     TABLE_NAME, theItem.name, theItem.year, theItem.grapes, theItem.country, theItem.region, 
     theItem.description);
@@ -180,8 +180,69 @@ exports.wineCreate = function(req, res) {
       });
     }
   });
-  
+};
 
+/*
+ * DELETE wine asset from database.
+ */
+exports.wineDelete = function(req, res) {
+  console.log('wineDelete()');
+
+  // prepare query for deleting item  
+  var itemId = req.params.id;
+  var queryStr = util.format('DELETE FROM %s WHERE id=\'%s\' ', 
+    TABLE_NAME, itemId);
+
+  console.log('will execute DB query:' + queryStr);
+  
+  db.query(queryStr, function(err, results) {
+    if (err) {
+      res.send(err.toString(), 404);      
+    } else {    
+      // check if there is actual row to be deleted
+      if (results.affectedRows === 0) {        
+        res.send('Wine with id=\'' + itemId + '\' is not found', 404);
+      } else {
+        // send the num of affected rows
+        res.send({
+          affectedRows: results.affectedRows
+        });
+      }
+    }
+  });
+};
+
+/*
+ * UPDATE wine asset from database.
+ */
+exports.wineUpdate = function(req, res) {
+  console.log('wineUpdate()');
+
+  // prepare query for inserting new item
+  var theItem = req.body;  
+  var queryStr = util.format('UPDATE %s SET name=\'%s\', year=\'%s\', ' + 
+    ' grapes=\'%s\', country=\'%s\',  region=\'%s\', description=\'%s\' ' +
+    ' WHERE id=\'%s\'', 
+    TABLE_NAME, theItem.name, theItem.year, theItem.grapes, theItem.country, theItem.region, 
+    theItem.description, theItem.id);
+
+  console.log('will execute DB query:' + queryStr);
+  
+  db.query(queryStr, function(err, results) {
+    if (err) {
+      res.send(err.toString(), 404);      
+    } else {    
+      // check if there is any row has been changed
+      if (results.affectedRows === 0) {        
+        res.send('Wine with id=\'' + theItem.id + '\' is not found', 404);
+      } else {
+        // send the num of affected rows
+        res.send({
+          affectedRows: results.affectedRows
+        });
+      }
+    }
+  });
 };
 
 initDB();

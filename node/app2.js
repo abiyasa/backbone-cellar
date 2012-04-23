@@ -29,6 +29,8 @@ app.configure('production', function(){
 // Routes
 app.get('/api/wines/:id?', routes.wineGet);
 app.post('/api/wines/:id?', routes.wineCreate);
+app.del('/api/wines/:id?', routes.wineDelete);
+app.put('/api/wines/:id?', routes.wineUpdate);
 app.get('/api/*', function(req, res) {
   // unsupported API
   res.send(false);
