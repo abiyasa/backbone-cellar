@@ -5,8 +5,8 @@ window.Wine = Backbone.Model.extend({
         "id":null,
         "name":"",
         "grapes":"",
-        "country":"USA",
-        "region":"California",
+        "country":"Italy",
+        "region":"Tuscany",
         "year":"",
         "description":"",
         "picture":""
@@ -90,6 +90,9 @@ window.WineView = Backbone.View.extend({
         // this.model.set(change);
     },
 
+    // a flag to indicate wait for server result for create, delete, and update
+    statusWait: true,
+    
     saveWine:function () {
         this.model.set({
             name:$('#name').val(),
@@ -102,19 +105,28 @@ window.WineView = Backbone.View.extend({
         if (this.model.isNew()) {
             var self = this;
             app.wineList.create(this.model, {
+                wait: this.statusWait,
                 success:function () {
                     app.navigate('wines/' + self.model.id, false);
-                }
+                },
+                error: function() {
+                    alert('Error! Cannot add new wine to our database!');
+                }                
             });
         } else {
-            this.model.save();
+            this.model.save(null, {
+                wait: this.statusWait,
+                success:function () {
+                    alert('Wine has been updated!');
+                }              
+            });
         }
-
         return false;
     },
 
     deleteWine:function () {
         this.model.destroy({
+            wait: this.statusWait,
             success:function () {
                 alert('Wine deleted successfully');
                 window.history.back();
@@ -191,6 +203,7 @@ var AppRouter = Backbone.Router.extend({
     },
 
     newWine:function () {
+
         if (app.wineView) app.wineView.close();
         app.wineView = new WineView({model:new Wine()});
         $('#content').html(app.wineView.render().el);
